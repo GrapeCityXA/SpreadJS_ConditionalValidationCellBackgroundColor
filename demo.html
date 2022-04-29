@@ -1,0 +1,76 @@
+<html>
+
+<head>
+    <title>grapecity_spreadJS_demo</title>
+    <script src="jquery_3.1.1.min.js" type="text/javascript"></script>
+    <link rel="stylesheet" href="gc.spread.sheets.excel2013white.14.2.2.css" type="text/css">
+    <script src="gc.spread.sheets.all.14.2.2.min.js" type="text/javascript"></script>
+    <script src="gc.spread.excelio.14.2.2.min.js" type="text/javascript"></script>
+    <script src="https://cdn.grapecity.com.cn/spreadjs/scripts/FileSaver.min.js" type="text/javascript"></script>
+    <script src="gc.spread.sheets.resources.zh.14.2.2.min.js" type="text/javascript"></script>
+    <script src="gc.spread.sheets.print.14.2.2.min.js" type="text/javascript"></script>
+    <script src="gc.spread.sheets.pdf.14.2.2.min.js" type="text/javascript"></script>
+    <script src="gc.spread.sheets.charts.14.2.2.min.js" type="text/javascript"></script>
+    <script src="v14.js" type="text/javascript"></script>
+    <style type="text/css">
+        #ss {
+            height: 400px;
+            width: 100%
+        }
+        p{
+            color: #336699;
+            text-align: center;
+        }
+    </style>
+</head>
+
+<body>
+    <p>公式单元格条件验证通过添加背景色</p>
+    <div id="ss"></div>
+    <script type="text/javascript">
+        // Title:适应公式
+        // Description：值1+值2为0时，背景色变为红色
+        // Tag:自定义单元格类型、适应公式
+        GC.Spread.Common.CultureManager.culture('zh-cn');
+        var spreadNS = GC.Spread.Sheets;
+        window.onload = function() {
+            var spread = new GC.Spread.Sheets.Workbook(document.getElementById("ss"));
+            initSpread(spread);
+        };
+        
+        function MyCellType() {}
+        MyCellType.prototype = new spreadNS.CellTypes.Text();
+        MyCellType.prototype.paint = function(ctx, value, x, y, w, h, style, options) {
+            if (!value || value === 0) {
+                // 当value为0时触发逻辑
+                style.backColor = "red";
+            }
+            spreadNS.CellTypes.Base.prototype.paint.apply(this, [ctx, value, x, y, w, h, style, options]);
+        };
+        
+        function initSpread(spread) {
+            var sheet = spread.getSheet(0);
+            sheet.suspendPaint();
+        
+            sheet.setRowCount(8);
+            sheet.setColumnCount(3);
+        
+            sheet.setValue(0, 0, "值1", GC.Spread.Sheets.SheetArea.colHeader);
+            sheet.setValue(0, 1, "值2", GC.Spread.Sheets.SheetArea.colHeader);
+            sheet.setValue(0, 2, "值1+值2", GC.Spread.Sheets.SheetArea.colHeader);
+        
+            for (var i = 0; i < sheet.getRowCount() - 1; i++) {
+        
+                sheet.setValue(i, 0, i);
+                sheet.setValue(i, 1, 0 - i);
+                // var j = i+1;
+                sheet.setFormula(i, 2, "=A" + (i + 1) + "+B" + (i + 1));
+                sheet.setCellType(i, 2, new MyCellType());
+        
+            }
+            sheet.resumePaint();
+        }
+    </script>
+</body>
+
+</html>
